@@ -1,3 +1,15 @@
+# Secret Keys
+*Credentials.py
+
+# zipped logs
+*.log.zip
+
+# vscode.settings.json
+.vscode/
+
+# local DB files
+*.json_db
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
