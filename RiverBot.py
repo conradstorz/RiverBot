@@ -17,10 +17,18 @@
     # update any local display devices
 
 """
-
+from os import sys, path
+from time import time, sleep
+from datetime import datetime
 from loguru import logger
 from pupdb.core import PupDB
 from Credentials import TWITTER_CREDENTIALS
+from LED_displays import DisplayMessage
+
+RUNTIME_NAME = path.basename(__file__)
+
+logger.remove()  # stop any default logger
+LOGGING_LEVEL = "INFO"
 
 @logger.catch
 def Main(credentials):
@@ -47,8 +55,8 @@ def Main(credentials):
         print(f"New Level: {new_level}")
         print(f"Trend: {trend}")
         while wait > 0:
-            startDisplay = int(time.time())
-            time.sleep(1)  # guarantee at least a one second pause
+            startDisplay = int(time())
+            sleep(1)  # guarantee at least a one second pause
             if (
                 startDisplay % 10
             ) == 0:  # update external displays connected to server each ten seconds.
@@ -61,7 +69,7 @@ def Main(credentials):
             ) == 0:  # every 50 seconds send a progress indication to attached display.
                 print("")
                 print(f"Wait time remaining: {wait}")
-            endDisplay = int(time.time())
+            endDisplay = int(time())
             elapsed = endDisplay - startDisplay
             print(f"{elapsed}.", end="", flush=True)
             wait = wait - elapsed

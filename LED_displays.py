@@ -6,6 +6,7 @@
 TODO
     Create OOP implementation. methods: display_text,init,display_color,...
 """
+from time import sleep
 from loguru import logger
 
 logger.remove()  # stop any default logger
@@ -29,7 +30,7 @@ def DisplayMessage(message):
     if SenseHatLoaded:
         # TODO add additonal data like temp and humidity of server hat
         SENSEHAT.show_message(message)
-        time.sleep(1)
+        sleep(1)
         # TODO monitor joystick input to exit pixel display early
         lastColor = Set_Random_Pixels(SENSEHAT)
         random_to_solid(SENSEHAT, colorName=lastColor, fast=True)

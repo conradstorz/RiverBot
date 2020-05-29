@@ -4,7 +4,7 @@
 """Provide routines to Tweet strings to Twitter.
 
 TODO
-    Create OOP implementation. example: obj/my_account  methods: tweet,init,time_of_last_tweet,status 
+    Create OOP implementation. example: obj/my_account  methods: tweet,init,status(last tweet and time of tweet)
 """
 
 from loguru import logger
@@ -15,6 +15,8 @@ from Credentials import TWITTER_CREDENTIALS
 a, b, c, d = TWITTER_CREDENTIALS
 # establish the twitter access object
 twitter_access = Twython(a, b, c, d)
+
+PupDB_MRTkey = 'Most_Recent_Tweet'
 
 @logger.catch
 def send_tweet(db, time, tweet, twttr):
