@@ -60,6 +60,5 @@ def log_error(txt):
 def retrieve_cleaned_html(url):
     raw_resp = simple_get(url)
     if raw_resp is not None:
-        # print(BeautifulSoup(raw_resp, "xml").prettify())
         return BeautifulSoup(raw_resp, "html.parser")
     return None

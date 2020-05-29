@@ -5,6 +5,9 @@
 river level data for any listed dams. By using the mileage marker for a point along the river 
 the level of the river at that point can be calculated.
 """
+# TODO this module should populate a database with observations and forecasts
+# TODO that database can then be queried by the riverbot
+
 from tabulate import tabulate
 
 from loguru import logger
@@ -26,6 +29,7 @@ from WebScrapeTools import retrieve_cleaned_html
 from lxml import etree as ET
 
 from RiverGuages import RIVER_MONITORING_POINTS, IMPORTANT_OBSERVATIONS, RIVER_GUAGES
+
 RUNTIME_NAME = path.basename(__file__)
 Data_datestamp = datetime.now()
 
@@ -189,5 +193,5 @@ if __name__ == "__main__":
     result = MAIN()
     if result == True:
         logger.info("Program ended normally.")
-    else:        
-        logger.info("Program ended abnormally.")   
+    else:
+        logger.info("Program ended abnormally.")

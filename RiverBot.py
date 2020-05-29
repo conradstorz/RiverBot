@@ -13,6 +13,6 @@
 # start loop
 
     # check river database
-    # tweet status if needed and 
-        # update tweet database
-        # update any local display devices
+    # tweet status if needed and
+    # update tweet database
+    # update any local display devices
