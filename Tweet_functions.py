@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Provide routines to Tweet strings to Twitter
+"""Provide routines to Tweet strings to Twitter.
+
+TODO
+    Create OOP implementation. example: obj/my_account  methods: tweet,init,time_of_last_tweet,status 
 """
 
 from loguru import logger

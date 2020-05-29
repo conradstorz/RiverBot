@@ -6,7 +6,8 @@ river level data for any listed dams. By using the mileage marker for a point al
 the level of the river at that point can be calculated.
 """
 # TODO this module should populate a database with observations and forecasts
-# TODO that database can then be queried by the riverbot
+# TODO that database can then be queried by the riverbot.
+# TODO Create an OOP implementation. example: obj/Guage methods: update,init,latest,forecast,flooding_state,phys_params(like location and elevation)
 
 from tabulate import tabulate
 

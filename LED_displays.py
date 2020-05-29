@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 
 """Provide routines to update connected displays such as SenseHat or another LED matrix
+
+TODO
+    Create OOP implementation. methods: display_text,init,display_color,...
 """
 from loguru import logger
 
