@@ -18,16 +18,13 @@
 
 """
 
+from loguru import logger
+from pupdb.core import PupDB
 from Credentials import TWITTER_CREDENTIALS
 
 @logger.catch
 def Main(credentials):
     defineLoggers()
-
-    # unpack the credentials before submitting to Twython
-    a, b, c, d = credentials
-    # establish the twitter access object
-    twitter = Twython(a, b, c, d)
     # activate PupDB file for persistent storage
     TimeNow = datetime.now()
     storage_db = PupDB(PupDB_FILENAME)
