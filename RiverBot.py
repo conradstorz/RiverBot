@@ -38,7 +38,7 @@ def Main(credentials):
     storage_db = PupDB(PupDB_FILENAME)
     last_tweet = storage_db.get(PupDB_MRTkey)
     last_level = storage_db.get(PupDB_MRLkey)
-    if last_tweet == None:  # Pre-load empty database
+    if last_tweet is None:  # Pre-load empty database
         last_tweet = str(TimeNow)
         last_level = MINIMUM_CONCERN_LEVEL
         storage_db.set(PupDB_MRTkey, last_tweet)
