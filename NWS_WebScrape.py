@@ -12,11 +12,7 @@ logger.remove()  # stop any default logger
 LOGGING_LEVEL = "INFO"
 
 from WebScrapeTools import retrieve_cleaned_html
-
-mcalpine = "https://water.weather.gov//ahps2/river.php?wfo=lmk&wfoid=18699&riverid=204624&pt%5B%5D=142935&allpoints=150960%2C141893%2C143063%2C144287%2C142160%2C145137%2C143614%2C141268%2C144395%2C143843%2C142481%2C143607%2C145086%2C142497%2C151795%2C152657%2C141266%2C145247%2C143025%2C142896%2C144670%2C145264%2C144035%2C143875%2C143847%2C142264%2C152144%2C143602%2C144126%2C146318%2C141608%2C144451%2C144523%2C144877%2C151578%2C142935%2C142195%2C146116%2C143151%2C142437%2C142855%2C142537%2C142598%2C152963%2C143203%2C143868%2C144676%2C143954%2C143995%2C143371%2C153521%2C153530%2C143683&data%5B%5D=obs&data%5B%5D=xml"
-
-mrklnd = "https://water.weather.gov//ahps2/river.php?wfo=lmk&wfoid=18699&riverid=204624&pt%5B%5D=144523&allpoints=150960%2C141893%2C143063%2C144287%2C142160%2C145137%2C143614%2C141268%2C144395%2C143843%2C142481%2C143607%2C145086%2C142497%2C151795%2C152657%2C141266%2C145247%2C143025%2C142896%2C144670%2C145264%2C144035%2C143875%2C143847%2C142264%2C152144%2C143602%2C144126%2C146318%2C141608%2C144451%2C144523%2C144877%2C151578%2C142935%2C142195%2C146116%2C143151%2C142437%2C142855%2C142537%2C142598%2C152963%2C143203%2C143868%2C144676%2C143954%2C143995%2C143371%2C153521%2C153530%2C143683&data%5B%5D=obs"
-
+from RiverGuages import MARKLAND_GUAGE_XML_URL as mrklnd
 
 @logger.catch
 def get_NWS_web_data(site):
@@ -109,6 +105,20 @@ def decode_database_key(s):
     rdng = lst[1]
     dstr = lst[2]
     return (gid, rdng, dstr)
+
+@logger.catch
+def Scrape_NWS_site(site):
+    """Return a dictionary of guage readings from supplied XML tabular text site.
+    """
+    raw_data, guage_id, friendly_name = get_NWS_web_data(site)
+    # TODO verify webscraping success
+    data_list = sort_and_label_data(raw_data, guage_id, friendly_name)
+    # TODO verify successful conversion of data
+    database_keys = generate_database_keys(data_list)
+    # TODO compare length of keys_list to length of data_list for validity
+    database_dict = dict(zip(database_keys, data_list))
+    # TODO compare length of database to data_list to verify all items included
+    return database_dict
 
 
 @logger.catch
