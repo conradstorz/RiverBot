@@ -8,11 +8,12 @@ Data is tuple of level and flowrate. (currently no flow data is published)
 """
 from loguru import logger
 
-logger.remove()  # stop any default logger
+# logger.remove()  # stop any default logger
 LOGGING_LEVEL = "INFO"
 
 from WebScrapeTools import retrieve_cleaned_html
-from RiverGuages import MARKLAND_GUAGE_XML_URL as mrklnd
+from RiverGuages import RIVER_MONITORING_POINTS, RIVER_GUAGES
+
 
 @logger.catch
 def get_NWS_web_data(site):
@@ -37,15 +38,23 @@ def FixDate(s, currentyear, time_zone="UTC"):
 
 
 @logger.catch
-def sort_and_label_data(web_data, guage_id, guage_string):
+def sort_and_label_data(web_data, guage_details):
     readings = []
+    guage_id = guage_details[0]
+    elev = guage_details[1]
+    milemarker = guage_details[2]
     labels = ["datetime", "level", "flow"]
     for i, item in enumerate(web_data):
         if i >= 1:  # zeroth item is an empty list
             # locate the name of this section (observed / forecast)
             section = item.find(class_="data_name").contents[0]
             sect_name = section.split()[0]
-            row_dict = {"guage": guage_id, "type": sect_name}
+            row_dict = {
+                "guage": guage_id,
+                "elevation": elev,
+                "milemarker": milemarker,
+                "type": sect_name,
+            }
             # extract all readings from this section
             section_data_list = item.find_all(class_="names_infos")
             # organize the readings and add details
@@ -58,7 +67,12 @@ def sort_and_label_data(web_data, guage_id, guage_string):
                 if pointer == 2:  # end of this reading
                     readings.append(row_dict)  # add to the compilation
                     # reset the dict for next reading
-                    row_dict = {"guage": guage_id, "type": sect_name}
+                    row_dict = {
+                        "guage": guage_id,
+                        "elevation": elev,
+                        "milemarker": milemarker,
+                        "type": sect_name,
+                    }
     return readings
 
 
@@ -106,13 +120,21 @@ def decode_database_key(s):
     dstr = lst[2]
     return (gid, rdng, dstr)
 
+
 @logger.catch
 def Scrape_NWS_site(site):
     """Return a dictionary of guage readings from supplied XML tabular text site.
     """
-    raw_data, guage_id, friendly_name = get_NWS_web_data(site)
+    site_url = site["guage_URL"]
+    raw_data, guage_id, friendly_name = get_NWS_web_data(site_url)
     # TODO verify webscraping success
-    data_list = sort_and_label_data(raw_data, guage_id, friendly_name)
+    guage_data = (
+        guage_id, 
+        site["guage_elevation"],
+        site["milemarker"],
+        friendly_name
+    )
+    data_list = sort_and_label_data(raw_data, guage_data)
     # TODO verify successful conversion of data
     database_keys = generate_database_keys(data_list)
     # TODO compare length of keys_list to length of data_list for validity
@@ -123,20 +145,20 @@ def Scrape_NWS_site(site):
 
 @logger.catch
 def Main():
-    # TODO scrape all guages of interest and combine into dictionary
-    raw_data, guage_id, friendly_name = get_NWS_web_data(mrklnd)
+    mrklndguage = RIVER_GUAGES[1]
+    mrklnd = RIVER_MONITORING_POINTS[mrklndguage]
+    print(mrklnd)
+    dbd = Scrape_NWS_site(mrklnd)
+
     # TODO verify webscraping success
-    data_list = sort_and_label_data(raw_data, guage_id, friendly_name)
-    # TODO verify successful conversion of data
-    database_keys = generate_database_keys(data_list)
-    # TODO compare length of keys_list to length of data_list for validity
-    database_dict = dict(zip(database_keys, data_list))
-    # TODO compare length of database to data_list to verify all items included
-    for k, v in database_dict.items():
+
+
+    for k, v in dbd.items():
         print(k)
         print(v)
         print()
     return True
 
 
-Main()
+if __name__ == "__main__":
+    Main()

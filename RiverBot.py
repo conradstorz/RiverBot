@@ -24,6 +24,7 @@ from NWS_WebScrape import Scrape_NWS_site
 from os import sys, path
 from loguru import logger
 from pupdb.core import PupDB
+from datetime import datetime
 
 RUNTIME_NAME = path.basename(__file__)
 
@@ -32,6 +33,8 @@ LOGGING_LEVEL = "INFO"
 
 @logger.catch
 def defineLoggers():
+    """Set options for logging.
+    """
     logger.add(
         sys.stderr,
         colorize=True,
@@ -62,7 +65,7 @@ def Main(credentials):
     last_tweet = storage_db.get(PupDB_MRTkey)
     last_level = storage_db.get(PupDB_MRLkey)
     if last_tweet is None:  # Pre-load empty database
-        last_tweet = str(TimeNow)
+        last_tweet = str(TIMENOW)
         last_level = MINIMUM_CONCERN_LEVEL
         storage_db.set(PupDB_MRTkey, last_tweet)
         storage_db.set(PupDB_MRLkey, last_level)
@@ -75,7 +78,7 @@ def Main(credentials):
         # update any local display devices      
     return False # should never end
 
-    
+
 if __name__ == "__main__":
     Main(TWITTER_CREDENTIALS)
 
