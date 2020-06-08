@@ -1,6 +1,5 @@
 # Secret Keys
-secrets/
-*Credentials.py
+*Credentials*
 
 # zipped logs
 *.log.zip
