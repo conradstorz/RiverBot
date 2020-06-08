@@ -47,7 +47,9 @@ from Credentials import RIVER_DATABASE_NAME, BOT_DATABASE_NAME
 
 
 NWS_website_baseaddress = (
-    "https://water.weather.gov//ahps2/river.php?wfo=lmk&wfoid=18699&riverid=204624&pt%5B%5D="
+    "https://water.weather.gov/"
+    "/ahps2/river.php?wfo=lmk&wfoid=18699&"
+    "riverid=204624&pt%5B%5D="
 )
 NWS_website_tailaddress = (
     "&pt%5B%5D=144523&allpoints=150960&data%5B%5D=obs&data%5B%5D=xml"
@@ -105,4 +107,4 @@ if __name__ == "__main__":
     for guage in RIVER_GUAGES:
         print()
         print(guage)
-        print(RIVER_MONITORING_POINTS[guage]["Dam_URL"])
+        print(RIVER_MONITORING_POINTS[guage])
