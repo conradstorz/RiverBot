@@ -11,8 +11,8 @@ from loguru import logger
 # logger.remove()  # stop any default logger
 LOGGING_LEVEL = "INFO"
 
-from WebScrapeTools import retrieve_cleaned_html
-from RiverGuages import RIVER_MONITORING_POINTS, RIVER_GUAGES
+from .WebScrapeTools import retrieve_cleaned_html
+from .RiverGuages import RIVER_MONITORING_POINTS, RIVER_GUAGES
 
 
 @logger.catch

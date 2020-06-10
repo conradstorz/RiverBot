@@ -18,8 +18,8 @@
 
 """
 
-import RiverGuages
-from NWS_WebScrape import Scrape_NWS_site
+from .RiverGuages import *
+from .NWS_WebScrape import Scrape_NWS_site
 
 from os import sys, path
 from loguru import logger
