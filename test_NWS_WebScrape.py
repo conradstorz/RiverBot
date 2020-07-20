@@ -4,7 +4,7 @@
 """Code coverage for NWS_WebScrape functions.
 """
 
-from .NWS_WebScrape import expand_datestring, compact_datestring
+from NWS_WebScrape import expand_datestring, compact_datestring
 
 """
 @composite # generate a tuple containing month,day,year,time,tzone in fixed sizes
