@@ -1,11 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""NWS website scraping for river guage observations and forecasts.
+"""National Weather Service(NWS) website scraping 
+for river guage observations and forecasts.
 This module will create local database of readings and forecasts.
 A single database will contain the readings from any guages of interest.
-Keys are the guage name + datetime of reading/forecast + R/F label
-Data is tuple of level and flowrate. (currently no flow data is published)
+Keys are the guage name + date of webscrape.
+    Data is a dict of webscrape times in UTC. 
+        Webscrape times contain a dict of NWS reported times in UTC.
+            Data is guagename and details, 
+                    observed/forecast tag, 
+                    NWS:UTC timestamp for value.
 """
+from pupdb.core import PupDB
 from datetime import *
 from dateutil.parser import *
 from loguru import logger
@@ -13,14 +19,15 @@ from loguru import logger
 # logger.remove()  # stop any default logger
 LOGGING_LEVEL = "INFO"
 
+# used to standardize string formats across modules
+from time_strings import CURRENT_YEAR, TODAY_STRING, NOW_STRING
+
 from WebScrapeTools import retrieve_cleaned_html
-from RiverGuages import RIVER_MONITORING_POINTS, RIVER_GUAGES
+from RiverGuages import RIVER_MONITORING_POINTS, RIVER_GUAGES, PupDB_FILENAME
 
 # National Weather Service does not put the YEAR into the tabular data of their website
 # we must declare the current year here.
-TODAY = date.today()
-CURRENT_YEAR = TODAY.year
-TODAY_STRING = TODAY.strftime("%Y-%m-%d")
+
 
 @logger.catch
 def get_NWS_web_data(site):
@@ -47,7 +54,7 @@ def FixDate(s, currentyear, time_zone="UTC"):
     If Observation dates are in December, Forecast dates must be checked 
     and fixed for roll over into next year.
     """
-    #TODO check and fix end of year forecast dates
+    # TODO check and fix end of year forecast dates
     date_string, time_string = s.split()
     month_digits, day_digits = date_string.split("/")
     return (month_digits, day_digits, currentyear, time_string, time_zone)
@@ -98,9 +105,7 @@ def sort_and_label_data(web_data, guage_details):
 def compact_datestring(ds):
     """Return a string representing datetime of provided tuple.
     """
-    a = f"{ds[2]}-{ds[0]}-{ds[1]} {ds[3]} {ds[4]}"
-    b = parse(a)
-    return b
+    return f"{ds[2]}-{ds[0]}-{ds[1]}_{ds[3]}{ds[4]}"
 
 
 @logger.catch
@@ -117,8 +122,8 @@ def expand_datestring(ds):
 
 
 @logger.catch
-def generate_database_keys(web_list, time):
-    """Take a list of dicts and return a unique key for each dict in list.
+def generate_primary_database_keys(web_list, time):
+    """Take a list of dicts and return a key for each dict in list.
     """
     keys = []
     ts = TODAY_STRING
@@ -126,7 +131,7 @@ def generate_database_keys(web_list, time):
         dt = compact_datestring(itm["datetime"])
         tp = itm["type"]
         gg = itm["guage"]
-        key = f"{ts}@{gg}-{tp}-{dt}"
+        key = f"{dt}"
         keys.append(key)
     return keys
 
@@ -147,27 +152,32 @@ def Scrape_NWS_site(site):
     """Return a dictionary of guage readings from supplied XML tabular text site.
     """
     site_url = site["guage_URL"]
-    raw_data, guage_id, friendly_name, scrape_start_time, duration_of_scrape = get_NWS_web_data(site_url)
-    print(f'Time to process website: {duration_of_scrape}')
-    print(f'Webscrape started at: {scrape_start_time}')
+    # get the data for this guage
+    (
+        raw_data,
+        guage_id,
+        friendly_name,
+        scrape_start_time,
+        duration_of_scrape,
+    ) = get_NWS_web_data(site_url)
+    print(f"Time to process website: {duration_of_scrape}")
+    print(f"Webscrape started at: {scrape_start_time}")
     # TODO verify webscraping success
-    guage_data = (
-        guage_id, 
-        site["guage_elevation"],
-        site["milemarker"],
-        friendly_name
-    )
-    data_list = sort_and_label_data(raw_data, guage_data)
+    guage_data = (guage_id, site["guage_elevation"], site["milemarker"], friendly_name)
+    valuabledata_list = sort_and_label_data(raw_data, guage_data)
     # TODO verify successful conversion of data
-    database_keys = generate_database_keys(data_list, scrape_start_time)
+    database_keys = generate_primary_database_keys(valuabledata_list, scrape_start_time)
     # TODO compare length of keys_list to length of data_list for validity
-    database_dict = dict(zip(database_keys, data_list))
+    database_dict = dict(zip(database_keys, valuabledata_list))
     # TODO compare length of database to data_list to verify all items included
     return database_dict
 
 
 @logger.catch
 def Main():
+    print('Program Start.')
+    print(f'Today is: {TODAY}')  
+    storage_db = PupDB(PupDB_FILENAME)    # activate PupDB file for persistent storage      
     mrklndguage = RIVER_GUAGES[1]
     mrklnd = RIVER_MONITORING_POINTS[mrklndguage]
     print(mrklnd)
@@ -175,10 +185,12 @@ def Main():
 
     # TODO verify webscraping success
 
-
+    count = 0
     for k, v in dbd.items():
-        print(k, v)
+        count += 1
+        # print(k, v)
         pass
+    print(f'Total values retrieved: {count}')
 
     return True
 
