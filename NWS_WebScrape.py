@@ -11,16 +11,19 @@ Keys are the guage name + date of webscrape.
                     observed/forecast tag, 
                     NWS:UTC timestamp for value.
 """
+
+from os import path
 from pupdb.core import PupDB
 from datetime import *
 from dateutil.parser import *
 from loguru import logger
 
-# logger.remove()  # stop any default logger
 LOGGING_LEVEL = "INFO"
+RUNTIME_NAME = path.basename(__file__)
+from core_logging_setup import defineLoggers
 
 # used to standardize string formats across modules
-from time_strings import CURRENT_YEAR, TODAY_STRING, NOW_STRING
+from time_strings import CURRENT_YEAR, TODAY_STRING, TODAY
 
 from WebScrapeTools import retrieve_cleaned_html
 from RiverGuages import RIVER_MONITORING_POINTS, RIVER_GUAGES, PupDB_FILENAME
@@ -160,8 +163,8 @@ def Scrape_NWS_site(site):
         scrape_start_time,
         duration_of_scrape,
     ) = get_NWS_web_data(site_url)
-    print(f"Time to process website: {duration_of_scrape}")
-    print(f"Webscrape started at: {scrape_start_time}")
+    logger.info(f"Time to process website: {duration_of_scrape}")
+    logger.info(f"Webscrape started at: {scrape_start_time}")
     # TODO verify webscraping success
     guage_data = (guage_id, site["guage_elevation"], site["milemarker"], friendly_name)
     valuabledata_list = sort_and_label_data(raw_data, guage_data)
@@ -175,12 +178,13 @@ def Scrape_NWS_site(site):
 
 @logger.catch
 def Main():
-    print('Program Start.')
-    print(f'Today is: {TODAY}')  
+    defineLoggers(LOGGING_LEVEL, RUNTIME_NAME)
+    logger.info('Program Start.')
+    logger.info(f'Today is: {TODAY}')  
     storage_db = PupDB(PupDB_FILENAME)    # activate PupDB file for persistent storage      
     mrklndguage = RIVER_GUAGES[1]
     mrklnd = RIVER_MONITORING_POINTS[mrklndguage]
-    print(mrklnd)
+    logger.info(mrklnd)
     dbd = Scrape_NWS_site(mrklnd)
 
     # TODO verify webscraping success
@@ -190,7 +194,7 @@ def Main():
         count += 1
         # print(k, v)
         pass
-    print(f'Total values retrieved: {count}')
+    logger.info(f'Total values retrieved: {count}')
 
     return True
 
