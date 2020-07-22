@@ -6,6 +6,7 @@
 import sys
 from loguru import logger
 
+
 @logger.catch
 def defineLoggers(LOGGING_LEVEL, RUNTIME_NAME):
     """Set options for logging.

@@ -23,7 +23,9 @@ RUNTIME_NAME = path.basename(__file__)
 from core_logging_setup import defineLoggers
 
 # used to standardize string formats across modules
-from time_strings import CURRENT_YEAR, TODAY_STRING, TODAY
+from time_strings import CURRENT_YEAR, NOW, NOW_STRING, TODAY, timefstring
+
+TS_LABEL_STR = "timestamp"
 
 from WebScrapeTools import retrieve_cleaned_html
 from RiverGuages import RIVER_MONITORING_POINTS, RIVER_GUAGES, PupDB_FILENAME
@@ -58,20 +60,23 @@ def FixDate(s, currentyear, time_zone="UTC"):
     and fixed for roll over into next year.
     """
     # TODO check and fix end of year forecast dates
+    """
     date_string, time_string = s.split()
     month_digits, day_digits = date_string.split("/")
     return (month_digits, day_digits, currentyear, time_string, time_zone)
+    """
+    return timefstring(parse(s))
 
 
 @logger.catch
-def sort_and_label_data(web_data, guage_details):
+def sort_and_label_data(web_data, guage_details, time):
     """Returns a list of relevant data from webscrape.
     """
     readings = []
     guage_id = guage_details[0]
     elev = guage_details[1]
     milemarker = guage_details[2]
-    relevant_label = ["datetime", "level", "flow"]
+    relevant_label = [TS_LABEL_STR, "level", "flow"]
     for i, item in enumerate(web_data):
         if i >= 1:  # zeroth item is an empty list
             # locate the name of this section (observed / forecast)
@@ -79,6 +84,7 @@ def sort_and_label_data(web_data, guage_details):
             sect_name = section.split()[0]
             row_dict = {
                 "guage": guage_id,
+                "scrape time": time,
                 "elevation": elev,
                 "milemarker": milemarker,
                 "type": sect_name,
@@ -97,6 +103,7 @@ def sort_and_label_data(web_data, guage_details):
                     # reset the dict for next reading
                     row_dict = {
                         "guage": guage_id,
+                        "scrape time": time,
                         "elevation": elev,
                         "milemarker": milemarker,
                         "type": sect_name,
@@ -105,36 +112,14 @@ def sort_and_label_data(web_data, guage_details):
 
 
 @logger.catch
-def compact_datestring(ds):
-    """Return a string representing datetime of provided tuple.
-    """
-    return f"{ds[2]}-{ds[0]}-{ds[1]}_{ds[3]}{ds[4]}"
-
-
-@logger.catch
-def expand_datestring(ds):
-    """Return elements of provided datestring as tuple.
-    """
-    x = ds.split("_")
-    m = x[0][:2]
-    d = x[0][2:4]
-    y = x[0][-4:]
-    t = x[1][:5]
-    z = x[1][-3:]
-    return (m, d, y, t, z)
-
-
-@logger.catch
-def generate_primary_database_keys(web_list, time):
+def generate_primary_database_keys(web_list):
     """Take a list of dicts and return a key for each dict in list.
     """
     keys = []
-    ts = TODAY_STRING
+
     for itm in web_list:
-        dt = compact_datestring(itm["datetime"])
-        tp = itm["type"]
-        gg = itm["guage"]
-        key = f"{dt}"
+        cdt = itm[TS_LABEL_STR]
+        key = f"{cdt}"
         keys.append(key)
     return keys
 
@@ -167,9 +152,12 @@ def Scrape_NWS_site(site):
     logger.info(f"Webscrape started at: {scrape_start_time}")
     # TODO verify webscraping success
     guage_data = (guage_id, site["guage_elevation"], site["milemarker"], friendly_name)
-    valuabledata_list = sort_and_label_data(raw_data, guage_data)
+    valuabledata_list = sort_and_label_data(raw_data, guage_data, NOW_STRING)
+    from tabulate import tabulate
+
+    print(tabulate(valuabledata_list, headers="keys"))
     # TODO verify successful conversion of data
-    database_keys = generate_primary_database_keys(valuabledata_list, scrape_start_time)
+    database_keys = generate_primary_database_keys(valuabledata_list)
     # TODO compare length of keys_list to length of data_list for validity
     database_dict = dict(zip(database_keys, valuabledata_list))
     # TODO compare length of database to data_list to verify all items included
@@ -179,9 +167,9 @@ def Scrape_NWS_site(site):
 @logger.catch
 def Main():
     defineLoggers(LOGGING_LEVEL, RUNTIME_NAME)
-    logger.info('Program Start.')
-    logger.info(f'Today is: {TODAY}')  
-    storage_db = PupDB(PupDB_FILENAME)    # activate PupDB file for persistent storage      
+    logger.info("Program Start.")
+    logger.info(f"Today is: {TODAY}")
+    storage_db = PupDB(PupDB_FILENAME)  # activate PupDB file for persistent storage
     mrklndguage = RIVER_GUAGES[1]
     mrklnd = RIVER_MONITORING_POINTS[mrklndguage]
     logger.info(mrklnd)
@@ -194,7 +182,15 @@ def Main():
         count += 1
         # print(k, v)
         pass
-    logger.info(f'Total values retrieved: {count}')
+    logger.info(f"Total values retrieved: {count}")
+
+    """
+    # send records to CSV format
+    import csv
+    with open('mycsvfile.csv','wb') as f:
+        w = csv.writer(f)
+        w.writerow(dbd.items())
+    """
 
     return True
 

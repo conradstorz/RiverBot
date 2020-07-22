@@ -1,0 +1,60 @@
+# use 'get'
+dict1 = {'a':1, 'b':2}
+
+print(dict1.get('c'))
+print(dict1['c'])
+
+# Returns: None
+# Returns: AttributeError
+
+
+
+
+# use dict comprehensions
+heights = {'John': 175, 'Jane': 150, 'Jim': 155, 'Matt': 170}
+
+tall = {key:value for (key, value) in heights.items() if value >= 170}
+
+print(tall)
+# Returns: {'John': 175, 'Matt': 170}
+
+
+
+
+# merge 2 dicts using the KWARGS feature
+dict1 = {'a': 1, 'b': 2}
+dict2 = {'c': 3, 'd': 4}
+
+dict3 = {**dict1, **dict2}
+
+print(dict3)
+
+# Returns: {'a': 1, 'b': 2, 'c': 3, 'd': 4}
+
+
+# write dict to CSV
+# Here's some code that writes each key/value pair on a separate row:
+
+import csv
+
+somedict = dict(raymond='red', rachel='blue', matthew='green')
+with open('mycsvfile.csv','wb') as f:
+    w = csv.writer(f)
+    w.writerows(somedict.items())
+
+If instead you want all the keys on one row and all the values on the next, that is also easy:
+
+with open('mycsvfile.csv','wb') as f:
+    w = csv.writer(f)
+    w.writerow(somedict.keys())
+    w.writerow(somedict.values())
+
+Pro tip: When developing code like this, 
+set the writer to w = csv.writer(sys.stderr) 
+so you can more easily see what is being generated. 
+When the logic is perfected, switch back to w = csv.writer(f).
+
+with open('mycsvfile.csv','wb') as f:
+    w = csv.writer(sys.stderr)
+    w.writerow(somedict.keys())
+    w.writerow(somedict.values())
