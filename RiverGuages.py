@@ -37,15 +37,6 @@ TWEET_FREQUENCY = [
 # ACTION_DICT = dict(zip(ACTION_LEVELS, ACTION_LABELS))
 LOCATION_OF_INTEREST = 584  # river mile marker @ Bushman's Lake
 
-
-from twython import Twython, TwythonError
-from Credentials import APP_KEY, APP_SECRET
-from Credentials import OAUTH_TOKEN, OAUTH_TOKEN_SECRET
-
-TWITTER_CREDENTIALS = (APP_KEY, APP_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
-from Credentials import RIVER_DATABASE_NAME, BOT_DATABASE_NAME
-
-
 NWS_website_baseaddress = (
     "https://water.weather.gov/"
     "/ahps2/river.php?wfo=lmk&wfoid=18699&"
