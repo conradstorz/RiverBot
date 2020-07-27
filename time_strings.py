@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""Standardize time strings and datetime objects used in project.
+"""
+
+
 from datetime import datetime, date
 import pytz
 
