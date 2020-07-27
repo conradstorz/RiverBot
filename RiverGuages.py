@@ -49,9 +49,8 @@ NWS_website_tailaddress = (
 
 NWS_OHIO_RIVER_ID = "204624"
 
-ACTION_LABELS = ["First-action", "Minor-flood", "Moderate-flood", "Major-flood"]
-
 MARKLAND_DAM_URL = "https://water.weather.gov/ahps2/hydrograph.php?wfo=iln&gage=mklk2"
+
 MARKLAND_DAM_NAME = "Markland"
 MARKLAND_DAM_LOWER_GUAGE_ID = "144523"
 MARKLAND_GUAGE_XML_URL = (
