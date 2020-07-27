@@ -23,13 +23,14 @@ from time_strings import CURRENT_YEAR, TODAY_STRING, NOW_STRING
 from RiverGuages import *
 from NWS_WebScrape import Scrape_NWS_site
 from core_logging_setup import defineLoggers
+from Credentials import TWITTER_CREDENTIALS
 
-from os import sys, path
+from pathlib import Path
 from loguru import logger
 from pupdb.core import PupDB
 from datetime import datetime
 
-RUNTIME_NAME = path.basename(__file__)
+RUNTIME_NAME = Path(__file__).name
 
 logger.remove()  # stop any default logger
 LOGGING_LEVEL = "INFO"

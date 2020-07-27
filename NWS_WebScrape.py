@@ -12,7 +12,8 @@ Keys are the guage name + date of webscrape.
                     NWS:UTC timestamp for value.
 """
 
-from os import path
+from pathlib import Path
+from time import sleep
 from pupdb.core import PupDB
 from datetime import *
 from dateutil.parser import *
@@ -21,7 +22,7 @@ from tabulate import tabulate
 
 
 LOGGING_LEVEL = "INFO"
-RUNTIME_NAME = path.basename(__file__)
+RUNTIME_NAME = Path(__file__).name
 from core_logging_setup import defineLoggers
 
 # used to standardize string formats across modules
@@ -162,33 +163,43 @@ def display_tabulardata(datalist_of_dicts):
 
 
 @logger.catch
-def save_results_to_storage(datadict_of_dicts):
-    """save unique readings and forecasts to a database
+def save_results_to_storage(list_of_dicts):
+    """save unique readings and forecasts to longterm storage.
+    list_of_dicts is expected to contain one dict for each reading/forecast
     """
-    fname = datadict_of_dicts[0]['scrape time']
-    print(fname)
-    write_csv(datadict_of_dicts, filename=fname)
+    fname = list_of_dicts[0]['scrape time']
+    logger.info(f'Creating CSV filename: {fname}')
+    # TODO organize storage as a tree of directories: YEAR/MONTH/DAY/xx:xx:xx
+    write_csv(list_of_dicts, filename=fname)
 
 
 @logger.catch
-def Main():
-
-    defineLoggers(LOGGING_LEVEL, RUNTIME_NAME)
-    logger.info("Program Start.")
-    logger.info(f"Today is: {LOCAL_TODAY}")
-    storage_db = PupDB(PupDB_FILENAME)  # activate PupDB file for persistent storage
-
+def update_web_scrape_results():
+    """Update filesystem CSV records for latest website scrapes.
+    """
     for guage in RIVER_GUAGES:
         details = RIVER_MONITORING_POINTS[guage]
         logger.info(details)
         dbd, vdl = Scrape_NWS_site(details)
         display_tabulardata(vdl)
         save_results_to_storage(vdl)
+        sleep(1) # guarantee at least 1 second difference in webscrapes timestamps
         # TODO verify webscraping success
-
-    
         count = len(dbd)
         logger.info(f"Total values retrieved: {count} from {details['Friendly_Name']}")
+
+    return True
+
+
+@logger.catch
+def Main():
+    """Update webscrape files.
+    """
+    defineLoggers(LOGGING_LEVEL, RUNTIME_NAME)
+    logger.info("Program Start.")
+    logger.info(f"Today is: {LOCAL_TODAY}")
+    
+    update_web_scrape_results()
 
     return True
 
