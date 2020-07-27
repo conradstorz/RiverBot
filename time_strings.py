@@ -1,6 +1,6 @@
-from datetime import *
-from dateutil.parser import *
+from datetime import datetime, date
 import pytz
+
 
 tz_UTC = pytz.timezone("UTC")
 tz_LOCAL = pytz.timezone('America/Louisville')
@@ -8,6 +8,7 @@ tz_LOCAL = pytz.timezone('America/Louisville')
 
 def timefstring(dtobj):
     return f'{dtobj.strftime("%Y-%m-%d_%H:%M:%S")}UTC'
+
 
 LOCAL_TODAY = date.today()
 NOW_UTC = datetime.now(tz_UTC)
