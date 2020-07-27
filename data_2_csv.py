@@ -49,6 +49,14 @@ this_folder3 = Path(__file__).parent
 # verify a path exists:
 # Path('relative/path/to/nowhere').exists() # returns: False
 
+#Example of directory deletion by pathlib
+#pathobj = Path("demo/")
+#pathobj.rmdir()
+	
+#Example of file deletion by pathlib
+#pathobj = Path("demo/testfile.txt")
+#pathobj.unlink()
+
 """ access parts of a filename:
 >>> Path('static/dist/js/app.min.js').name
 'app.min.js'
