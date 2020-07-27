@@ -17,18 +17,21 @@ from pupdb.core import PupDB
 from datetime import *
 from dateutil.parser import *
 from loguru import logger
+from tabulate import tabulate
+
 
 LOGGING_LEVEL = "INFO"
 RUNTIME_NAME = path.basename(__file__)
 from core_logging_setup import defineLoggers
 
 # used to standardize string formats across modules
-from time_strings import LOCAL_CURRENT_YEAR, NOW_UTC_STRING, LOCAL_TODAY, timefstring
+from time_strings import LOCAL_CURRENT_YEAR, NOW_UTC_STRING, LOCAL_TODAY, timefstring, tz_UTC
 
 TS_LABEL_STR = "timestamp" # for use in generating data and indexing result
 
 from WebScrapeTools import retrieve_cleaned_html
 from RiverGuages import RIVER_MONITORING_POINTS, RIVER_GUAGES, PupDB_FILENAME
+from data_2_csv import write_csv
 
 # National Weather Service does not put the YEAR into the tabular data of their website
 # we must declare the current year here.
@@ -40,9 +43,9 @@ def get_NWS_web_data(site):
     should point to a page that provides tabular river data. This function returns
     the contents of the site and a timestamp of the actual website scraping event.
     """
-    start_time = datetime.now()
+    start_time = datetime.now(tz_UTC)
     clean_soup = retrieve_cleaned_html(site)
-    finish_time = datetime.now()
+    finish_time = datetime.now(tz_UTC)
     elapsed_time = finish_time - start_time
     guage_id = clean_soup.h1["id"]
     guage_string = clean_soup.h1.string
@@ -66,49 +69,42 @@ def FixDate(s, currentyear, time_zone="UTC"):
 
 @logger.catch
 def sort_and_label_data(web_data, guage_details, time):
-    """Returns a list of relevant data from webscrape.
+    """Returns a list of dicts containing relevant data from webscrape.
     """
     readings = []
-    guage_id = guage_details[0]
-    elev = guage_details[1]
-    milemarker = guage_details[2]
-    relevant_label = [TS_LABEL_STR, "level", "flow"]
+    guage_id, elev, milemarker, _ = guage_details
+    relevant_labels = [TS_LABEL_STR, "level", "flow"]
     for i, item in enumerate(web_data):
         if i >= 1:  # zeroth item is an empty list
             # locate the name of this section (observed / forecast)
             section = item.find(class_="data_name").contents[0]
             sect_name = section.split()[0]
-            row_dict = {
-                "guage": guage_id,
-                "scrape time": time,
-                "elevation": elev,
-                "milemarker": milemarker,
-                "type": sect_name,
-            }
+            row_dict = {}
             # extract all readings from this section
             section_data_list = item.find_all(class_="names_infos")
             # organize the readings and add details
             for i, data in enumerate(section_data_list):
                 element = data.contents[0]
                 pointer = i % 3  # each reading contains 3 unique data points
+                label = relevant_labels[pointer]
                 if pointer == 0:  # this is the element for date/time
                     element = FixDate(element, LOCAL_CURRENT_YEAR)
-                row_dict[relevant_label[pointer]] = element
+                row_dict[label] = element
                 if pointer == 2:  # end of this reading
+                    row_dict["guage"] = guage_id
+                    row_dict["scrape time"] = time
+                    row_dict["elevation"] = elev
+                    row_dict["milemarker"] = milemarker
+                    row_dict["type"] = sect_name             
                     readings.append(row_dict)  # add to the compilation
                     # reset the dict for next reading
-                    row_dict = {
-                        "guage": guage_id,
-                        "scrape time": time,
-                        "elevation": elev,
-                        "milemarker": milemarker,
-                        "type": sect_name,
-                    }
+                    row_dict={}
+
     return readings
 
 
 @logger.catch
-def generate_primary_database_keys(web_list):
+def generate_keys_based_on_timestamp(web_list):
     """Take a list of dicts and return a key for each dict in list.
     """
     keys = []
@@ -144,46 +140,55 @@ def Scrape_NWS_site(site):
         scrape_start_time,
         duration_of_scrape,
     ) = get_NWS_web_data(site_url)
-    logger.info(f"Time to process website: {duration_of_scrape}")
+
+    logger.info(f"Time to process website: {duration_of_scrape.total_seconds()} seconds.")
     logger.info(f"Webscrape started at: {scrape_start_time}")
     # TODO verify webscraping success
     guage_data = (guage_id, site["guage_elevation"], site["milemarker"], friendly_name)
-    valuabledata_list = sort_and_label_data(raw_data, guage_data, NOW_UTC_STRING)
+    ValuableData_listOfDicts = sort_and_label_data(raw_data, guage_data, timefstring(scrape_start_time))
     # TODO verify successful conversion of data
-    database_keys = generate_primary_database_keys(valuabledata_list)
+    database_keys = generate_keys_based_on_timestamp(ValuableData_listOfDicts)
     # TODO compare length of keys_list to length of data_list for validity
-    database_dict = dict(zip(database_keys, valuabledata_list))
+    database_dict = dict(zip(database_keys, ValuableData_listOfDicts))
     # TODO compare length of database to data_list to verify all items included
-    return (database_dict, valuabledata_list)
+    return (database_dict, ValuableData_listOfDicts)
+
+
+@logger.catch
+def display_tabulardata(datalist_of_dicts):
+    """create a new file based on the time of scrape
+    """
+    #print(tabulate(datalist_of_dicts, headers="keys"))    
+
+
+@logger.catch
+def save_results_to_storage(datadict_of_dicts):
+    """save unique readings and forecasts to a database
+    """
+    fname = datadict_of_dicts[0]['scrape time']
+    print(fname)
+    write_csv(datadict_of_dicts, filename=fname)
 
 
 @logger.catch
 def Main():
 
-    from tabulate import tabulate
-
     defineLoggers(LOGGING_LEVEL, RUNTIME_NAME)
     logger.info("Program Start.")
     logger.info(f"Today is: {LOCAL_TODAY}")
     storage_db = PupDB(PupDB_FILENAME)  # activate PupDB file for persistent storage
-    mrklndguage = RIVER_GUAGES[1]
-    mrklnd = RIVER_MONITORING_POINTS[mrklndguage]
-    logger.info(mrklnd)
-    dbd, vdl = Scrape_NWS_site(mrklnd)
 
-    # TODO verify webscraping success
+    for guage in RIVER_GUAGES:
+        details = RIVER_MONITORING_POINTS[guage]
+        logger.info(details)
+        dbd, vdl = Scrape_NWS_site(details)
+        display_tabulardata(vdl)
+        save_results_to_storage(vdl)
+        # TODO verify webscraping success
 
-    print(tabulate(vdl, headers="keys"))
-    count = len(dbd)
-    logger.info(f"Total values retrieved: {count}")
-
-    """
-    # send records to CSV format
-    import csv
-    with open('mycsvfile.csv','wb') as f:
-        w = csv.writer(f)
-        w.writerow(dbd.items())
-    """
+    
+        count = len(dbd)
+        logger.info(f"Total values retrieved: {count} from {details['Friendly_Name']}")
 
     return True
 
