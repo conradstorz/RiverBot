@@ -9,10 +9,12 @@ import pytz
 
 
 tz_UTC = pytz.timezone("UTC")
-tz_LOCAL = pytz.timezone('America/Louisville')
+tz_LOCAL = pytz.timezone("America/Louisville")
 
 
 def timefstring(dtobj):
+    """Standardize the format used for timestamp string format.
+    """
     return f'{dtobj.strftime("%Y-%m-%d_%H:%M:%S")}UTC'
 
 
