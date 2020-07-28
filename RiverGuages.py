@@ -98,3 +98,4 @@ if __name__ == "__main__":
         print()
         print(guage)
         print(RIVER_MONITORING_POINTS[guage])
+    print(f'Total guages known: {len(RIVER_GUAGES)}')
