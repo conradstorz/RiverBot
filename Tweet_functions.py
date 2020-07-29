@@ -9,12 +9,7 @@ TODO
 
 from loguru import logger
 from twython import Twython, TwythonError
-# from Credentials import TWITTER_CREDENTIALS
 
-# unpack the credentials before submitting to Twython
-# a, b, c, d = TWITTER_CREDENTIALS
-# establish the twitter access object
-# twitter_access = Twython(a, b, c, d)
 
 PupDB_MRTkey = 'Most_Recent_Tweet'
 
