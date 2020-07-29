@@ -26,7 +26,8 @@ RUNTIME_NAME = Path(__file__).name
 from core_logging_setup import defineLoggers
 
 # used to standardize string formats across modules
-from time_strings import LOCAL_CURRENT_YEAR, UTC_NOW_STRING, LOCAL_TODAY, timefstring, tz_UTC
+from time_strings import LOCAL_CURRENT_YEAR, UTC_NOW_STRING, LOCAL_TODAY
+from time_strings import timefstring, tz_UTC
 
 TS_LABEL_STR = "timestamp" # for use in generating data and indexing result
 
@@ -89,7 +90,7 @@ def sort_and_label_data(web_data, guage_details, time):
                 pointer = i % 3  # each reading contains 3 unique data points
                 label = relevant_labels[pointer]
                 if pointer == 0:  # this is the element for date/time
-                    element = FixDate(element, LOCAL_CURRENT_YEAR)
+                    element = FixDate(element, LOCAL_CURRENT_YEAR() )
                 row_dict[label] = element
                 if pointer == 2:  # end of this reading
                     row_dict["guage"] = guage_id
@@ -197,7 +198,7 @@ def Main():
     """
     defineLoggers(LOGGING_LEVEL, RUNTIME_NAME)
     logger.info("Program Start.")
-    logger.info(f"Today is: {LOCAL_TODAY}")
+    logger.info(f"Today is: {LOCAL_TODAY() }")
     
     update_web_scrape_results()
 

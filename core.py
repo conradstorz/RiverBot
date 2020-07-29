@@ -21,14 +21,14 @@
 from time_strings import LOCAL_CURRENT_YEAR, LOCAL_TODAY_STRING, LOCAL_NOW_STRING
 
 from RiverGuages import *
-from NWS_WebScrape import Scrape_NWS_site
+# from NWS_WebScrape import Scrape_NWS_site
 from core_logging_setup import defineLoggers
 from Credentials import TWITTER_CREDENTIALS
 
 from pathlib import Path
 from loguru import logger
 from pupdb.core import PupDB
-from datetime import datetime
+# from datetime import datetime
 
 RUNTIME_NAME = Path(__file__).name
 
@@ -45,7 +45,7 @@ def Main(credentials):
     last_tweet = storage_db.get(PupDB_MRTkey)
     last_level = storage_db.get(PupDB_MRLkey)
     if last_tweet is None:  # Pre-load empty database
-        last_tweet = str(NOW_STRING)
+        last_tweet = str(LOCAL_NOW_STRING())
         last_level = MINIMUM_CONCERN_LEVEL
         storage_db.set(PupDB_MRTkey, last_tweet)
         storage_db.set(PupDB_MRLkey, last_level)
