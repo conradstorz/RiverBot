@@ -26,7 +26,7 @@ RUNTIME_NAME = Path(__file__).name
 from core_logging_setup import defineLoggers
 
 # used to standardize string formats across modules
-from time_strings import LOCAL_CURRENT_YEAR, NOW_UTC_STRING, LOCAL_TODAY, timefstring, tz_UTC
+from time_strings import LOCAL_CURRENT_YEAR, UTC_NOW_STRING, LOCAL_TODAY, timefstring, tz_UTC
 
 TS_LABEL_STR = "timestamp" # for use in generating data and indexing result
 

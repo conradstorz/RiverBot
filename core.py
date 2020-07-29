@@ -18,7 +18,7 @@
 
 """
 # used to standardize string formats across modules
-from time_strings import CURRENT_YEAR, TODAY_STRING, NOW_STRING
+from time_strings import LOCAL_CURRENT_YEAR, LOCAL_TODAY_STRING, LOCAL_NOW_STRING
 
 from RiverGuages import *
 from NWS_WebScrape import Scrape_NWS_site
