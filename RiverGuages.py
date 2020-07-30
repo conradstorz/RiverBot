@@ -12,6 +12,10 @@ HIGHEST_TAG = "Highest  Observation:"
 LATEST_TAG = "Latest  observed"
 FORECAST_TAG = "Highest  Forecast:"
 OBSERVATION_TAGS = [LATEST_TAG, HIGHEST_TAG, FORECAST_TAG]
+GUAGE_URL_KEY = "guage_URL"
+GUAGE_MILEMARKER_KEY = "milemarker"
+GUAGE_ELEVATION_KEY = "guage_elevation"
+GUAGE_NAME_KEY = "Friendly_Name"
 
 ACTION_LABELS = [
     "No Flooding",
@@ -65,10 +69,10 @@ MCALPINE_GUAGE_XML_URL = (
 )
 
 MCALPINE_DAM_DETAILS = {  # some of these values can be used to test and verify data scraped from website
-    "Friendly_Name": "McAlpine Dam Upper Guage",
-    "guage_URL": MCALPINE_GUAGE_XML_URL,
-    "milemarker": 606.8,
-    "guage_elevation": 407.18,
+    GUAGE_NAME_KEY: "McAlpine Dam Upper Guage",
+    GUAGE_URL_KEY: MCALPINE_GUAGE_XML_URL,
+    GUAGE_MILEMARKER_KEY: 606.8,
+    GUAGE_ELEVATION_KEY: 407.18,
     ACTION_LABELS[0]: 21,
     ACTION_LABELS[1]: 23,
     ACTION_LABELS[2]: 30,
@@ -76,10 +80,10 @@ MCALPINE_DAM_DETAILS = {  # some of these values can be used to test and verify 
 }
 
 MARKLAND_DAM_DETAILS = {
-    "Friendly_Name": "Markland Dam Lower Guage",
-    "guage_URL": MARKLAND_GUAGE_XML_URL,
-    "milemarker": 531,
-    "guage_elevation": 408,
+    GUAGE_NAME_KEY: "Markland Dam Lower Guage",
+    GUAGE_URL_KEY: MARKLAND_GUAGE_XML_URL,
+    GUAGE_MILEMARKER_KEY: 531,
+    GUAGE_ELEVATION_KEY: 408,
     ACTION_LABELS[0]: 49,
     ACTION_LABELS[1]: 51,
     ACTION_LABELS[2]: 62,

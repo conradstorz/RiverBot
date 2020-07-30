@@ -32,7 +32,7 @@ from time_strings import timefstring, tz_UTC
 TS_LABEL_STR = "timestamp" # for use in generating data and indexing result
 
 from WebScrapeTools import retrieve_cleaned_html
-from RiverGuages import RIVER_MONITORING_POINTS, RIVER_GUAGES, PupDB_FILENAME
+from RiverGuages import RIVER_MONITORING_POINTS, RIVER_GUAGES, GUAGE_NAME_KEY
 from data_2_csv import write_csv
 
 # National Weather Service does not put the YEAR into the tabular data of their website
@@ -65,7 +65,6 @@ def FixDate(s, currentyear, time_zone="UTC"):
     and fixed for roll over into next year.
     """
     # TODO check and fix end of year forecast dates
-
     return timefstring(parse(s))
 
 
@@ -142,8 +141,9 @@ def Scrape_NWS_site(site):
         scrape_start_time,
         duration_of_scrape,
     ) = get_NWS_web_data(site_url)
-
-    logger.info(f"Time to process website: {duration_of_scrape.total_seconds()} seconds.")
+    
+    tot_secs = duration_of_scrape.total_seconds()
+    logger.info(f"Time to process website: {tot_secs} seconds.")
     logger.info(f"Webscrape started at: {scrape_start_time}")
     # TODO verify webscraping success
     guage_data = (guage_id, site["guage_elevation"], site["milemarker"], friendly_name)
@@ -187,7 +187,8 @@ def update_web_scrape_results():
         sleep(1) # guarantee at least 1 second difference in webscrapes timestamps
         # TODO verify webscraping success
         count = len(dbd)
-        logger.info(f"Total values retrieved: {count} from {details['Friendly_Name']}")
+        fnme = details[GUAGE_NAME_KEY]
+        logger.info(f"Total values retrieved: {count} from {fnme}")
 
     return True
 
@@ -198,7 +199,8 @@ def Main():
     """
     defineLoggers(LOGGING_LEVEL, RUNTIME_NAME)
     logger.info("Program Start.")
-    logger.info(f"Today is: {LOCAL_TODAY() }")
+    today = LOCAL_TODAY() 
+    logger.info(f"Today is: {today}")
     
     update_web_scrape_results()
 
