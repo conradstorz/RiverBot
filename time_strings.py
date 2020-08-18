@@ -16,7 +16,7 @@ tz_LOCAL = pytz.timezone("America/Louisville")
 def timefstring(dtobj):
     """Standardize the format used for timestamp string format.
     """
-    return f'{dtobj.strftime("%Y-%m-%d_%H:%M:%S")}UTC'
+    return f'{dtobj.strftime("%Y-%m-%d_%H:%M:%S")}'
 
 def LOCAL_TODAY():
     return  date.today()
@@ -31,13 +31,13 @@ def LOCAL_TODAY_STRING():
     return LOCAL_TODAY().strftime("%Y-%m-%d")
 
 def UTC_NOW_STRING():
-    return timefstring(UTC_NOW())
+    return "".join([timefstring(UTC_NOW()), 'UTC'])
 
 def LOCAL_NOW():
     return datetime.now(tz_LOCAL)
 
 def LOCAL_NOW_STRING():
-    return timefstring(LOCAL_NOW())
+    return "".join([timefstring(LOCAL_NOW()), 'EST'])
 
 
 if __name__ == "__main__":
@@ -48,7 +48,7 @@ if __name__ == "__main__":
         print(f"LOCAL CURRENT_YEAR: {LOCAL_CURRENT_YEAR()} type: {type(LOCAL_CURRENT_YEAR())}")
         print(f"LOCAL TODAY_STRING: {LOCAL_TODAY_STRING()} type: {type(LOCAL_TODAY_STRING())}")
         print(f"UTC NOW_STRING: {UTC_NOW_STRING()} type: {type(UTC_NOW_STRING())}")
-        print(f"LOCAL NOW_STRING: {LOCAL_TODAY_STRING()} type: {type(LOCAL_TODAY_STRING())}")
+        print(f"LOCAL NOW_STRING: {LOCAL_NOW_STRING()} type: {type(LOCAL_NOW_STRING())}")
         sleep(2)
         print()
 
