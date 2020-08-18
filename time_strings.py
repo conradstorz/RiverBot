@@ -13,10 +13,15 @@ tz_UTC = pytz.timezone("UTC")
 tz_LOCAL = pytz.timezone("America/Louisville")
 
 
-def timefstring(dtobj):
+def timefstring(dtobj, tz_name=True):
     """Standardize the format used for timestamp string format.
+    Include 3 letter string for timezone if set to True.
     """
-    return f'{dtobj.strftime("%Y-%m-%d_%H:%M:%S")}'
+    if tz_name:
+        return f'{dtobj.strftime("%Y-%m-%d_%H:%M:%S%Z")}'
+    else:
+        return f'{dtobj.strftime("%Y-%m-%d_%H:%M:%S")}'
+
 
 def LOCAL_TODAY():
     return  date.today()
@@ -31,13 +36,13 @@ def LOCAL_TODAY_STRING():
     return LOCAL_TODAY().strftime("%Y-%m-%d")
 
 def UTC_NOW_STRING():
-    return "".join([timefstring(UTC_NOW()), 'UTC'])
+    return timefstring(UTC_NOW())
 
 def LOCAL_NOW():
     return datetime.now(tz_LOCAL)
 
 def LOCAL_NOW_STRING():
-    return "".join([timefstring(LOCAL_NOW()), 'EST'])
+    return timefstring(LOCAL_NOW())
 
 
 if __name__ == "__main__":

@@ -14,20 +14,21 @@ Keys are the guage name + date of webscrape.
 
 from pathlib import Path
 from time import sleep
-from pupdb.core import PupDB
-from datetime import *
+# from pupdb.core import PupDB
+
+# from datetime import *
 from dateutil.parser import *
+# used to standardize string formats across modules
+from time_strings import LOCAL_CURRENT_YEAR, UTC_NOW, LOCAL_TODAY
+from time_strings import timefstring
+
 from loguru import logger
-from tabulate import tabulate
+# from tabulate import tabulate
 
 
 LOGGING_LEVEL = "INFO"
 RUNTIME_NAME = Path(__file__).name
 from core_logging_setup import defineLoggers
-
-# used to standardize string formats across modules
-from time_strings import LOCAL_CURRENT_YEAR, UTC_NOW_STRING, LOCAL_TODAY
-from time_strings import timefstring, tz_UTC
 
 TS_LABEL_STR = "timestamp" # for use in generating data and indexing result
 
@@ -45,9 +46,9 @@ def get_NWS_web_data(site):
     should point to a page that provides tabular river data. This function returns
     the contents of the site and a timestamp of the actual website scraping event.
     """
-    start_time = datetime.now(tz_UTC)
+    start_time = UTC_NOW()
     clean_soup = retrieve_cleaned_html(site)
-    finish_time = datetime.now(tz_UTC)
+    finish_time = UTC_NOW()
     elapsed_time = finish_time - start_time
     guage_id = clean_soup.h1["id"]
     guage_string = clean_soup.h1.string
