@@ -80,10 +80,10 @@ def FixDate(s, currentyear, time_zone=pytzutc):
 @logger.catch
 def sort_and_label_data(web_data, guage_details, time):
     """Returns a list of dicts containing relevant data from webscrape.
+    NWS results are in UTC timezone for both observations and forecasts.
+    Results are stored to CSV file with all timestamps in UTC.
     """
-    # TODO Verify that observation times are in UTC
-    # TODO Verify that prediction times are in UTC
-    
+
     readings = []
     LCY = LOCAL_CURRENT_YEAR()
     guage_id, elev, milemarker, _ = guage_details
