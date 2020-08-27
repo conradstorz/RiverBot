@@ -20,7 +20,7 @@ def timefstring(dtobj, tz_name=True):
     if tz_name:
         return f'{dtobj.strftime("%Y-%m-%d_%H:%M:%S%Z")}'
     else:
-        return f'{dtobj.strftime("%Y-%m-%d_%H:%M:%S")}'
+        return f'{dtobj.strftime("%Y-%m-%d_%H:%M:%S")}NTZ' #NTZ = Naive Time Zone
 
 
 def LOCAL_TODAY():
