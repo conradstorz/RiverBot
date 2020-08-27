@@ -18,6 +18,9 @@ from time import sleep
 
 # from datetime import *
 from dateutil.parser import *
+from pytz import utc as pytzutc
+
+
 # used to standardize string formats across modules
 from time_strings import LOCAL_CURRENT_YEAR, UTC_NOW, LOCAL_TODAY
 from time_strings import timefstring
@@ -58,7 +61,7 @@ def get_NWS_web_data(site):
 
 
 @logger.catch
-def FixDate(s, currentyear, time_zone="UTC"):
+def FixDate(s, currentyear, time_zone=pytzutc):
     """Split date from time and add timezone label.
     Unfortunately, NWS chose not to include the year. 
     This will be problematic when forecast dates are into the next year.
@@ -66,14 +69,23 @@ def FixDate(s, currentyear, time_zone="UTC"):
     and fixed for roll over into next year.
     """
     # TODO check and fix end of year forecast dates
-    return timefstring(parse(s))
+
+    p = parse(s) # parse is returning a timezone-naive datetime obj 
+    # additionally, parse is appending the current year into the object
+    aware = p.replace(tzinfo=time_zone)
+
+    return timefstring(aware)
 
 
 @logger.catch
 def sort_and_label_data(web_data, guage_details, time):
     """Returns a list of dicts containing relevant data from webscrape.
     """
+    # TODO Verify that observation times are in UTC
+    # TODO Verify that prediction times are in UTC
+    
     readings = []
+    LCY = LOCAL_CURRENT_YEAR()
     guage_id, elev, milemarker, _ = guage_details
     relevant_labels = [TS_LABEL_STR, "level", "flow"]
     for i, item in enumerate(web_data):
@@ -90,7 +102,7 @@ def sort_and_label_data(web_data, guage_details, time):
                 pointer = i % 3  # each reading contains 3 unique data points
                 label = relevant_labels[pointer]
                 if pointer == 0:  # this is the element for date/time
-                    element = FixDate(element, LOCAL_CURRENT_YEAR() )
+                    element = FixDate(element, LCY )
                 row_dict[label] = element
                 if pointer == 2:  # end of this reading
                     row_dict["guage"] = guage_id
