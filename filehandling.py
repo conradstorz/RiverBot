@@ -71,6 +71,7 @@ this_folder3 = Path(__file__).parent
 def clean_filename_str(fn):
     """Remove invalid characters from provided string.
     """
+    if type(fn) != str: return fn
     return Path("".join(i for i in fn if i not in "\/:*?<>|"))
 
 
