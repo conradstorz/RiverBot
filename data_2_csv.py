@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# version 1.0
 """Create a file and populate with items from a data structure.
 """
 
