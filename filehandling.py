@@ -93,3 +93,7 @@ def check_and_validate(fname, direc, rename=True):
             raise(FileExistsError)
     return OUT_PATH_HANDLE
 
+
+if __name__ == "__main__":
+    print(f'This file {this_file} has no current standalone function.')
+    

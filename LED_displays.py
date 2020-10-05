@@ -35,3 +35,8 @@ def DisplayMessage(message):
         lastColor = Set_Random_Pixels(SENSEHAT)
         random_to_solid(SENSEHAT, colorName=lastColor, fast=True)
     return True
+
+if __name__ == "__main__":
+    from pathlib import Path
+    this_file = Path(__file__)
+    print(f'This file {this_file} has no current standalone function.')
