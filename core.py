@@ -11,9 +11,8 @@
 
 # start loop
 
-    # check river database
-    # tweet status if needed and
-    # update tweet database
+    # check river database and update if needed
+    # tweet status if needed and update tweet database
     # update any local display devices
 
 """
@@ -23,6 +22,8 @@ from time_strings import LOCAL_CURRENT_YEAR, LOCAL_TODAY_STRING, LOCAL_NOW_STRIN
 from RiverGuages import *
 # from NWS_WebScrape import Scrape_NWS_site
 from core_logging_setup import defineLoggers
+
+# TODO try import credentials and notify if missing
 from Credentials import TWITTER_CREDENTIALS
 
 from pathlib import Path
@@ -38,7 +39,9 @@ LOGGING_LEVEL = "INFO"
 
 @logger.catch
 def Main(credentials):
-    """Main loop. Run eternally.
+    """Main function declaration.
+    requires:
+        credentials: tuple (Twitter credentials)
     """
     defineLoggers()
     storage_db = PupDB(PupDB_FILENAME)    # activate PupDB file for persistent storage
@@ -51,11 +54,12 @@ def Main(credentials):
         storage_db.set(PupDB_MRLkey, last_level)
         forecast_level = last_level
         storage_db.set(PupDB_MRFkey, forecast_level)
+
     # initialization complete. Begin main loop. 
-        # check river database
-        # tweet status if needed and
-        # update tweet database
-        # update any local display devices      
+        # check river database and update if needed
+        # tweet status if needed and update tweet database
+        # update any local display devices
+
     return False # should never end
 
 
